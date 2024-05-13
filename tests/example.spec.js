@@ -44,4 +44,28 @@ describe('Blog app', () => {
       await expect(locator).toBeVisible()
     })
   })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      const texboxes = await page.getByRole('textbox').all()
+      await texboxes[0].fill(user.username)
+      await texboxes[1].fill(user.password)
+
+      await page.click('text=login')
+    })
+
+    test('A blog can be created', async ({ page }) => {
+      await page.click('text=New blog entry')
+
+      const texboxes = await page.getByRole('textbox').all()
+      await texboxes[0].fill('Playwright is awesome')
+      await texboxes[1].fill('John Appleseed')
+      await texboxes[2].fill('http://www.johnappleseed.com/')
+
+      const buttons = await page.getByRole('button').all()
+      await buttons[1].click()
+      const locator = await page.getByText('Playwright is awesome by John Appleseed').last()
+      await expect(locator).toBeVisible()
+    })
+  })
 })
