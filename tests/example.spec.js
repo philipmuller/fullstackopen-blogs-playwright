@@ -1,7 +1,6 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
 
 //Note: for end to end tests to work, the server needs to be in test mode connected to the test database (NODE_ENV=test)
-
 describe('Blog app', () => {
   let user = {
     username: 'play',
@@ -54,18 +53,36 @@ describe('Blog app', () => {
       await page.click('text=login')
     })
 
-    test('A blog can be created', async ({ page }) => {
+    const createNewBlog = async (page) => {
       await page.click('text=New blog entry')
 
       const texboxes = await page.getByRole('textbox').all()
       await texboxes[0].fill('Playwright is awesome')
       await texboxes[1].fill('John Appleseed')
-      await texboxes[2].fill('http://www.johnappleseed.com/')
+      await texboxes[2].fill('http://www.johnappleseed.com')
 
       const buttons = await page.getByRole('button').all()
       await buttons[1].click()
+    }
+
+    test('A blog can be created', async ({ page }) => {
+      await createNewBlog(page)
+
       const locator = await page.getByText('Playwright is awesome by John Appleseed').last()
       await expect(locator).toBeVisible()
     })
+
+    test('A blog can be liked (can be edited)', async ({ page }) => {
+      await createNewBlog(page)
+
+      await page.click('text=view details')
+      const locator = await page.getByText('0 likes')
+      await expect(locator).toBeVisible()
+
+      await page.click('text=like')
+      const locator2 = await page.getByText('1 likes')
+      await expect(locator2).toBeVisible()
+    })
+    
   })
 })
