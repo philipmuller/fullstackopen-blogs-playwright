@@ -83,6 +83,17 @@ describe('Blog app', () => {
       const locator2 = await page.getByText('1 likes')
       await expect(locator2).toBeVisible()
     })
-    
+
+    test('A blog can be deleted by the user who added the blog', async ({ page }) => {
+      await createNewBlog(page)
+
+      await page.click('text=view details')
+
+      page.on('dialog', async dialog => { await dialog.accept()})
+      await page.click('text=Delete blog')
+      const locator = await page.getByText('Playwright is awesome by John Appleseed deleted')
+      await expect(locator).toBeVisible()
+    })
+
   })
 })
